@@ -1,5 +1,5 @@
-exports.handler = serverless(server);
 // Import necessary modules
+const serverless = require('serverless-http'); // NEW
 require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -13,7 +13,6 @@ const userRoutes = require('./routes/userRoutes');
 
 // Initialize the Express application
 const app = express();
-const PORT = process.env.PORT || 5000;
 
 // Middleware to handle large file uploads
 app.use(bodyParser.json({ limit: '50mb' }));
@@ -23,9 +22,10 @@ app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 app.use(cors());
 
 // Connect to MongoDB using the URI from environment variables
+// Note: This connection logic will run once per cold start of the function.
 mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log('MongoDB connected'))
-  .catch(err => console.log(err));
+  .catch(err => console.error('MongoDB connection error:', err)); // Changed to console.error for better visibility
 
 // --- Code to automatically handle the index error on server start ---
 // This listener runs only after a successful MongoDB connection is established.
@@ -57,9 +57,20 @@ mongoose.connection.on('connected', async () => {
 // -------------------- End of Index Fix Code --------------------
 
 // Set up API routes
-app.use('/api/auth', authRoutes);
-app.use('/api/tasks', taskRoutes);
-app.use('/api/users', userRoutes);
+// IMPORTANT: For Netlify Functions, you must add a base path
+// This is the router for all your API endpoints
+const router = express.Router();
+router.use('/auth', authRoutes);
+router.use('/tasks', taskRoutes);
+router.use('/users', userRoutes);
 
-// Start the server and listen for incoming requests
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+// Mount the router on the Netlify Functions path
+app.use('/.netlify/functions/api', router); // NEW
+
+// Remove the local server listener as it is not needed for Netlify Functions
+// We are no longer using app.listen()
+// app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+// Export the Express app wrapped in the serverless-http library
+// This is what Netlify Functions will execute
+module.exports.handler = serverless(app); // NEW
