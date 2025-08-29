@@ -5,8 +5,8 @@
   "main": "server.js",
   "type": "commonjs",
   "scripts": {
-    "dev": "netlify dev",         // run locally with Netlify CLI
-    "start": "node server.js",    // optional: run plain Express locally
+    "dev": "netlify dev",        
+    "start": "node server.js", 
     "build": "npm ci",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
