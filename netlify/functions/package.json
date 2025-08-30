@@ -5,13 +5,14 @@
   "main": "server.js",
   "type": "commonjs",
   "scripts": {
-    "dev": "netlify dev",         
-    "start": "node server.js",    
+    "dev": "netlify dev",
+    "start": "node server.js",
     "build": "npm ci",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
+    "body-parser": "^1.20.2",
     "cloudinary": "^1.26.0",
     "cors": "^2.8.5",
     "dotenv": "^10.0.0",
@@ -19,8 +20,7 @@
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^6.0.12",
     "multer": "^1.4.3",
-    "serverless-http": "^3.2.0",
-    "body-parser": "^1.20.2"
+    "serverless-http": "^3.2.0"
   },
   "license": "ISC",
   "author": ""
